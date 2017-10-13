@@ -28,6 +28,7 @@ description for details.
 Good luck and happy searching!
 """
 
+from util import manhattanDistance
 from game import Directions
 from game import Agent
 from game import Actions
@@ -428,23 +429,19 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     listPositions = foodGrid.asList()
-    if(len(listPositions) == 0):
+    if(len(listPositions) == 0): #nothing to be done here 
         return 0
 
-    theChosenOne = listPositions[0]
-    theChosenDistance = distance(position, theChosenOne)
+    element = listPositions[0]
+    distance = manhattanDistance(position, element)
 
-    #Calcula a distancia entre o escolhido e todos os outros candidatos, fazendo com que o mais proximo seja escolhido.
-    for oponentOfTheChosenOne in listPositions[1:]:
-        oponentOfTheChosenOneDistance = distance(position, oponentOfTheChosenOne)
-        if(oponentOfTheChosenOneDistance < theChosenDistance):
-            theChosenDistance = oponentOfTheChosenOneDistance
-            theChosenOne = oponentOfTheChosenOne
+    for actualElement in listPositions[1:]:
+        actualDistance = manhattanDistance(position, actualElement)
+        if(actualDistance < distance):
+            distance = actualDistance
+            element = actualElement
 
-    return distance(position, theChosenOne)
-
-def distance(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    return manhattanDistance(position, element)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
