@@ -72,20 +72,20 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthSearch(problem, state, visited=[]):
-    visited.append(state)
-    for successor in problem.getSuccessors(state):
-        state = successor[0]
-        direction = successor[1]
+def depthSearch(problem, estado, visitados=[]):
+    visitados.append(estado)
+    for successor in problem.getSuccessors(estado):
+        estado = successor[0]
+        direcao = successor[1]
 
-        if problem.isGoalState(state):
-            return [direction]
+        if problem.isGoalState(estado):
+            return [direcao]
 
-        if state not in visited:
-            search = depthSearch(problem, state, visited)
-            if len(search) > 0:
-                search.insert(0, direction)
-                return search
+        if estado not in visitados:
+            consultado = depthSearch(problem, estado, visitados)
+            if len(consultado) > 0:
+                consultado.insert(0, direcao)
+                return consultado
 
     return []
 
@@ -109,71 +109,64 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    queue = util.Queue()
-    queue.push((problem.getStartState(), []))
-    visited = []
+    fila = util.Queue()
+    fila.push((problem.getStartState(), []))
+    visitados = []
 
-    while not queue.isEmpty():
-        current = queue.pop()
-        currentState = current[0]
-        currentPath = current[1]
+    while not fila.isEmpty():
+        atual = fila.pop()
+        estadoAtual = atual[0]
+        caminhoAtual = atual[1]
 
-        visited.append(currentState)
+        visitados.append(estadoAtual)
 
-        for successor in problem.getSuccessors(currentState):
-            state = successor[0]
-            direction = successor[1]
+        for proximo in problem.getSuccessors(estadoAtual):
+            estado = proximo[0]
+            direcao = proximo[1]
 
-            path = list(currentPath)
-            path.append(direction)
+            path = list(caminhoAtual)
+            path.append(direcao)
 
-            if problem.isGoalState(state):
+            if problem.isGoalState(estado):
                 return path
 
-            if state not in visited:
-                queue.push((state, path))
+            if estado not in visitados:
+                fila.push((estado, path))
 
     return []
 
-def graphSearch(problem, allPaths):
-    exploredNodes = []
-    allPaths.push([(problem.getStartState(),"Stop", 0)])
+def graphSearch(problem, caminhos):
+    percorridos = []
+    caminhos.push([(problem.getStartState(),"Stop", 0)])
 
-    while not allPaths.isEmpty():
-        #Seleciona um caminho (o do topo da piha)
-        path = allPaths.pop()
+    while not caminhos.isEmpty():
+        caminho = caminhos.pop()
 
-        #pega a ultima posicao e salva em lastNodeOfThePath
-        lastNodeOfThePath = path[len(path) - 1]
+        ultimoNo = caminho[len(caminho) - 1]
 
-        print(lastNodeOfThePath)
+        ultimoNo = ultimoNo[0]
 
-        lastNodeOfThePath = lastNodeOfThePath[0]
+        if problem.isGoalState(ultimoNo):
+            return [x[1] for x in caminho][1:]
 
-        # Se essa posicao for solucao retorna o caminho ate essa posicao, eliminando a primeira entrada que e a posicao inicial do pacman
-        if problem.isGoalState(lastNodeOfThePath):
-            return [x[1] for x in path][1:]
+        if ultimoNo not in percorridos:
+            percorridos.append(ultimoNo)
 
-        # Se a posicao nao foi explorada ainda, adiciona ela na lista de nos explorados e constroi os caminhos possiveis pra cada direcao
-        # a partir dessa posicao, inserindo-os em allPaths para serem processados nas proximas iteracoes.
-        if lastNodeOfThePath not in exploredNodes:
-            exploredNodes.append(lastNodeOfThePath)
+            for proximoNo in problem.getSuccessors(ultimoNo):
+                if proximoNo[0] not in percorridos:
+                    proximoCaminho = caminho[:]
+                    proximoCaminho.append(proximoNo)
+                    caminhos.push(proximoCaminho)
 
-            for nextNode in problem.getSuccessors(lastNodeOfThePath):
-                if nextNode[0] not in exploredNodes:
-                    nextNodePath = path[:]
-                    nextNodePath.append(nextNode)
-                    allPaths.push(nextNodePath)
 
-    #retorna [] caso nao encontre a comida por nenhum caminho
     return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    costLambda = lambda aPath: problem.getCostOfActions([x[1] for x in aPath])
-    allPaths = util.PriorityQueueWithFunction(costLambda)
-    return graphSearch(problem, allPaths)
+    custo = lambda caminho: problem.getCostOfActions([x[1] for x in caminho])
+    caminhos = util.PriorityQueueWithFunction(custo)
+    return graphSearch(problem, caminhos)
 
 def nullHeuristic(state, problem=None):
     """
